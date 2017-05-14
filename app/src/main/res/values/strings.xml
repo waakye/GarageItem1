@@ -1,3 +1,47 @@
 <resources>
-    <string name="app_name">GarageItem</string>
+    <!-- Name for the application [CHAR LIMIT=12] -->
+    <string name="app_name">Used Items</string>
+
+    <!-- Label for overflow menu option that inserts fake item data into the app [CHAR LIMIT=20] -->
+    <string name="action_insert_dummy_data">Insert Dummy Data</string>
+
+    <!-- Label for overflow menu option that deletes all item data in the app [CHAR LIMIT=20] -->
+    <string name="action_delete_all_entries">Delete All Items</string>
+
+    <!-- Title for the activity to add a new item [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_new_item">Add an Item</string>
+
+    <!-- Label for editor menu option to save item and leave editor [CHAR LIMIT=20] -->
+    <string name="action_save">Save</string>
+
+    <!-- Label for editor overflow menu option that deletes the current item [CHAR LIMIT=20] -->
+    <string name="action_delete">Delete</string>
+
+    <!-- Label for editor overflow menu option that sends a mail [CHAR LIMIT=20] -->
+    <string name="action_sendmail">Send Mail</string>
+
+    <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
+    <string name="category_overview">Overview</string>
+
+    <!-- Label for the price information in the editor [CHAR LIMIT=30] -->
+    <string name="category_price">Price</string>
+
+    <!-- Label for the quantity information in the editor [CHAR LIMIT=30] -->
+    <string name="category_quantity">Quantity</string>
+
+    <!-- Label for the image information in the editor [CHAR LIMIT=30] -->
+    <string name="category_image">Image</string>
+
+    <!-- Text hint for name field in editor [CHAR LIMIT=30] -->
+    <string name="hint_item_name">Name</string>
+
+    <!-- Text hint for price field in editor [CHAR LIMIT=30] -->
+    <string name="hint_item_price">Market Price</string>
+
+    <!-- Text hint for quantity field in editor [CHAR LIMIT=30] -->
+    <string name="hint_item_quantity">Available for Sale</string>
+
+    <!-- Text hint for name field in editor [CHAR LIMIT=30] -->
+    <string name="hint_item_image">Upload Image</string>
 </resources>
+
