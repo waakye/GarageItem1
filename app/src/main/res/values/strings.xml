@@ -1,12 +1,15 @@
 <resources>
     <!-- Name for the application [CHAR LIMIT=12] -->
-    <string name="app_name">Used Items</string>
+    <string name="app_name">Used Item Inventory</string>
 
     <!-- Label for overflow menu option that inserts fake item data into the app [CHAR LIMIT=20] -->
     <string name="action_insert_dummy_data">Insert Dummy Data</string>
 
     <!-- Label for overflow menu option that deletes all item data in the app [CHAR LIMIT=20] -->
     <string name="action_delete_all_entries">Delete All Items</string>
+
+    <!-- Label for the catalog button to add a new item -->
+    <string name="add_item_button">Add a New Item</string>
 
     <!-- Title for the activity to add a new item [CHAR LIMIT=20] -->
     <string name="editor_activity_title_new_item">Add an Item</string>
