@@ -23,7 +23,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:paddingLeft="4dp"
+            android:paddingLeft="@dimen/padding_left_indent"
             android:orientation="vertical">
             
             <EditText
@@ -50,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:paddingLeft="4dp"
+            android:paddingLeft="@dimen/padding_left_indent"
             android:orientation="vertical">
 
             <EditText
@@ -77,7 +77,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:paddingLeft="4dp"
+            android:paddingLeft="@dimen/padding_left_indent"
             android:orientation="vertical">
 
             <EditText
@@ -85,6 +85,33 @@
                 style="@style/EditorFieldStyle"
                 android:hint="@string/hint_item_quantity"
                 android:inputType="number" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Image category -->
+    <LinearLayout
+        android:id="@+id/container_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:hint="@string/category_image"
+            style="@style/CategoryStyle"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:paddingLeft="@dimen/padding_left_indent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/add_image_button"
+                android:text="@string/add_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
 
     </LinearLayout>

@@ -14,6 +14,8 @@
     <!-- Title for the activity to add a new item [CHAR LIMIT=20] -->
     <string name="editor_activity_title_new_item">Add an Item</string>
 
+    <string name="add_image_button">Select An Image</string>
+
     <!-- Label for editor menu option to save item and leave editor [CHAR LIMIT=20] -->
     <string name="action_save">Save</string>
 
