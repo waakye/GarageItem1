@@ -48,5 +48,7 @@
 
     <!-- Text hint for name field in editor [CHAR LIMIT=30] -->
     <string name="hint_item_image">Upload Image</string>
+
+    <string name="image_preview">Image Preview</string>
 </resources>
 

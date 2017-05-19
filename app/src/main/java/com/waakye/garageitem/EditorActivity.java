@@ -2,9 +2,12 @@ package com.waakye.garageitem;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,12 +16,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.io.FileDescriptor;
+import java.io.IOException;
 
 /**
  * Created by lesterlie on 5/15/17.
  */
 
 public class EditorActivity extends AppCompatActivity {
+
+    private boolean isGalleryPicture = false;
+
+
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     /** Tag for logging errors */
     private static final String LOG_TAG = CatalogActivity.class.getSimpleName();
@@ -38,14 +51,16 @@ public class EditorActivity extends AppCompatActivity {
 
     private static final String STATE_URI = "STATE_URI";
 
-//    private ImageView mImageView;
-//    private TextView mTextView;
+    private ImageView mImageView;
+    private TextView mTextView;
     private Button imageButton;
 
     private Uri mUri;
+    private Bitmap mBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(LOG_TAG, "onCreate() method called ... ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
@@ -54,8 +69,9 @@ public class EditorActivity extends AppCompatActivity {
         priceEditText = (EditText)findViewById(R.id.edit_item_price);
         quantityEditText = (EditText)findViewById(R.id.edit_item_quantity);
 
-//        mTextView = (TextView) findViewById(R.id.image_uri);
-//        mImageView = (ImageView) findViewById(R.id.image);
+        mTextView = (TextView) findViewById(R.id.image_uri);
+        mImageView = (ImageView) findViewById(R.id.image);
+
 
         imageButton = (Button)findViewById(R.id.add_image_button);
         imageButton.setOnClickListener(new View.OnClickListener(){
@@ -68,6 +84,7 @@ public class EditorActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.e(LOG_TAG, "onCreateOptionsMenu() method called ... ");
         // Inflate the menu options from the res/menu/menu_editor.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_editor, menu);
@@ -76,6 +93,7 @@ public class EditorActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.e(LOG_TAG, "onOptionsItemSelected() method called ... ");
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()){
             // Respond to a click on the "Save" menu option
@@ -118,18 +136,61 @@ public class EditorActivity extends AppCompatActivity {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        Log.e(LOG_TAG, "onActivityResult() called ...");
+        Log.i(LOG_TAG, "Received an \"Activity Result\"");
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code READ_REQUEST_CODE.
+        // If the request code seen here doesn't match, it's the response to some other intent,
+        // and the below code shouldn't run at all.
+
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             // The document selected by the user won't be returned in the intent.
             // Instead, a URI to that document will be contained in the return intent
-            // provided to this method as a parameter.
-            // Pull that URI using resultData.getData().
-            Uri uri = null;
-            // The resultData parameter contains the URI that points to the selected document.
+            // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
+
             if (resultData != null) {
-                uri = resultData.getData();
-                Log.i(LOG_TAG, "Uri: " + uri.toString());  // The code works to here
+                mUri = resultData.getData();
+                Log.i(LOG_TAG, "Uri: " + mUri.toString());
+
+                mTextView.setText(mUri.toString());
+                mBitmap = getBitmapFromUri(mUri);
+                mImageView.setImageBitmap(mBitmap);
+
+                isGalleryPicture = true;
+            }
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            Log.i(LOG_TAG, "Uri: " + mUri.toString());
+
+            mTextView.setText(mUri.toString());
+            mBitmap = getBitmapFromUri(mUri);
+            mImageView.setImageBitmap(mBitmap);
+
+            isGalleryPicture = false;
+        }
+    }
+
+
+    private Bitmap getBitmapFromUri(Uri uri) {
+        Log.e(LOG_TAG, "getBitmapFromUri() method called ... ");
+        ParcelFileDescriptor parcelFileDescriptor = null;
+        try {
+            parcelFileDescriptor =
+                    getContentResolver().openFileDescriptor(uri, "r");
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+            Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+            parcelFileDescriptor.close();
+            return image;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to load image.", e);
+            return null;
+        } finally {
+            try {
+                if (parcelFileDescriptor != null) {
+                    parcelFileDescriptor.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(LOG_TAG, "Error closing ParcelFile Descriptor");
             }
         }
     }
+
 }
