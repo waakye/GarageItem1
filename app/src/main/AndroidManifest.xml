@@ -35,7 +35,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CatalogActivity"/>
         </activity>
-
+        <provider
+            android:authorities="com.waakye.garageitem"
+            android:name=".data.UsedItemProvider"
+            android:exported="false"/>
     </application>
-
 </manifest>
