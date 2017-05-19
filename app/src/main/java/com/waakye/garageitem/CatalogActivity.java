@@ -1,5 +1,6 @@
 package com.waakye.garageitem;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,6 +17,11 @@ import com.waakye.garageitem.data.UsedItemDbHelper;
 
 public class CatalogActivity extends AppCompatActivity {
 
+    public static final String LOG_TAG = CatalogActivity.class.getSimpleName();
+
+    /** Database helper that will provide us access to the database */
+    private UsedItemDbHelper mDbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +37,10 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper and pass the
+        // context, which is the current activity
+        mDbHelper = new UsedItemDbHelper(this);
+
         displayDatabaseInfo();
     }
 
@@ -39,10 +49,6 @@ public class CatalogActivity extends AppCompatActivity {
      * the used_items database
      */
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper and pass the
-        // context, which is the current activity
-        UsedItemDbHelper mDbHelper = new UsedItemDbHelper(this);
-
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
@@ -63,6 +69,33 @@ public class CatalogActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Helper method to insert hardcoded used_items data into the database.  For debugging purposes
+     * only
+     */
+    private void insertUsedItemViaCatalogActivity() {
+        // Gets the database in write mode
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Create a ContentValues object where column names are the keys, and Used Socks's
+        // used_items attributes are the values
+        ContentValues values = new ContentValues();
+        values.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME, "Used Socks");
+        values.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE, 2);
+        values.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY, 5);
+        values.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI, "");
+
+
+        // Insert a new row for Used Socks in the database, returning the ID of that new row
+        // The first argument for db.insert() is the used_items table name.
+        // The second argument provides the name of a column in which the framework
+        // can insert NULL in the event that the ContentValues is empty (if
+        // this is set to "null", then the framework will not insert a row when
+        // there are no values).
+        // The third argument is the ContentValues object containing the info for Used Socks.
+        long newRowId = db.insert(UsedItemContract.UsedItemEntry.TABLE_NAME, null, values);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_catalog.xml file
@@ -77,7 +110,8 @@ public class CatalogActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-                // Do nothing for now
+                insertUsedItemViaCatalogActivity();
+                displayDatabaseInfo();
                 return true;
             case R.id.action_delete_all_entries:
                 // Do nothing for now
