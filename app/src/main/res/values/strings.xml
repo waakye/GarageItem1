@@ -50,5 +50,18 @@
     <string name="hint_item_image">Upload Image</string>
 
     <string name="image_preview">Image Preview</string>
+
+    <string name="detail_activity_title">Summary of Used Item</string>
+
+    <!-- Label for tracking the quantity in the Detail Activity -->
+    <string name="category_track_quantity">Track Quantity</string>
+
+    <string name="track_a_sale_button">Track a Sale</string>
+
+    <string name="receive_shipment_button">Receive Shipment</string>
+
+    <string name="delete_item_button">Delete Item</string>
+
+    <string name="order_more_button">Order More</string>
 </resources>
 
