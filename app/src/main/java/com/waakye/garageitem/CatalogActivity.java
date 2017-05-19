@@ -56,10 +56,24 @@ public class CatalogActivity extends AppCompatActivity {
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        // Perform this raw SQL query "SELECT * FROM used_items"
-        // to get a Cursor that contains all rows from the used_items table
-        Cursor cursor = db.rawQuery("SELECT * FROM "
-                + UsedItemContract.UsedItemEntry.TABLE_NAME, null);
+        // Define a projection that specifies which columns from the database you will actually use
+        // after this query
+        String[] projection = {
+                UsedItemContract.UsedItemEntry._ID,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI};
+
+        // Perform a query on the used_items table
+        Cursor cursor = db.query(
+                UsedItemContract.UsedItemEntry.TABLE_NAME,  // The table to query
+                projection,                                 // The columns to return
+                null,                                       // The columns for the WHERE clause
+                null,                                       // The values for the WHERE clause
+                null,                                       // Don't group the rows
+                null,                                       // Don't filter by row groups
+                null);                                      // The sort order
 
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
