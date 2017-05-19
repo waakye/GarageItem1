@@ -1,7 +1,9 @@
 package com.waakye.garageitem;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -18,6 +20,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.waakye.garageitem.data.UsedItemContract;
+import com.waakye.garageitem.data.UsedItemDbHelper;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -82,6 +88,49 @@ public class EditorActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Get user input from editor and save new used_item into database
+     */
+    private void insertUsedItemViaEditorActivity() {
+
+        // Read from input fields
+        // Use trim to eliminate leading or trailing white space
+        String nameString = nameEditText.getText().toString().trim();
+        String priceString = priceEditText.getText().toString().trim();
+        String quantityString = quantityEditText.getText().toString().trim();
+        String imageUriString = mUri.toString().trim();
+        int price = Integer.parseInt(priceString);
+        int weight = Integer.parseInt(quantityString);
+
+        // Create database helper
+        UsedItemDbHelper mDbHelper = new UsedItemDbHelper(this);
+
+        // Get the database in write mode
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Create a ContentValues object where column names are the keys, and used_item attributes
+        // from the editor are the values
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME, nameString);
+        contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE, priceString);
+        contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY, quantityString);
+        contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI, imageUriString);
+
+        // Insert a new row for the used_item in the database, returning the ID of that new row
+        long newRowId = database.insert(UsedItemContract.UsedItemEntry.TABLE_NAME,
+                null, contentValues);
+
+        // Show a toast message depending on whether or not the insertion was successful
+        if (newRowId == -1) {
+            // If the row ID is -1, then there was an error with insertion
+            Toast.makeText(this, "Error with saving used_item", Toast.LENGTH_SHORT).show();
+        } else {
+            // Otherwise, the insertion was successful and we can display a toast with the row ID
+            Toast.makeText(this, "Used_Item saved with row ID: " + newRowId,
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.e(LOG_TAG, "onCreateOptionsMenu() method called ... ");
@@ -98,7 +147,10 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()){
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+                // Save used_item to database
+                insertUsedItemViaEditorActivity();
+                // Exit activity
+                finish();
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

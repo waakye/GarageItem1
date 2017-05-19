@@ -28,8 +28,8 @@ public class CatalogActivity extends AppCompatActivity {
         setContentView(R.layout.activity_catalog);
 
         // Set up Add Item Button to open EditorActivity
-        Button addItemButton = (Button)findViewById(R.id.add_item_button);
-        addItemButton.setOnClickListener(new View.OnClickListener(){
+        Button addItemButton = (Button) findViewById(R.id.add_item_button);
+        addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
@@ -40,7 +40,11 @@ public class CatalogActivity extends AppCompatActivity {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper and pass the
         // context, which is the current activity
         mDbHelper = new UsedItemDbHelper(this);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         displayDatabaseInfo();
     }
 
