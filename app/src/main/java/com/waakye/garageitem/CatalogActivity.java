@@ -75,11 +75,47 @@ public class CatalogActivity extends AppCompatActivity {
                 null,                                       // Don't filter by row groups
                 null);                                      // The sort order
 
+        TextView displayView = (TextView)findViewById(R.id.text_view_used_item);
+
         try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // used_items table in the database).
-            TextView displayView = (TextView)findViewById(R.id.text_view_used_item);
-            displayView.setText("Number of rows in used_items database table: " + cursor.getCount());
+            // Create a header in the TextView that looks like this:
+            //
+            // The used_items table contains <number of rows in Cursor> used_items
+            // _id - name - price - quantity - image uri
+            //
+            //  In the while loop below, iterate through the rows of the cursor and display the
+            // information from each column in this order
+            displayView.setText("The used_items table contains " + cursor.getCount() + " used_items.\n\n");
+            displayView.append(UsedItemContract.UsedItemEntry._ID + " - "
+                        + UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME + " - "
+                        + UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE + " - "
+                        + UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY + " - "
+                        + UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI + "\n");
+
+            // Figure out the index of each column
+            int idColumnIndex = cursor.getColumnIndex(UsedItemContract.UsedItemEntry._ID);
+            int nameColumnIndex = cursor.getColumnIndex(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME);
+            int priceColumnIndex = cursor.getColumnIndex(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE);
+            int quantityColumnIndex = cursor.getColumnIndex(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY);
+            int imageUriColumnIndex = cursor.getColumnIndex(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI);
+
+            // iterate through all the returned rows in the cursor
+            while(cursor.moveToNext()) {
+                // Use that index to extract the String or Int value of the word
+                // at the current row the cursor is on
+                int currentID = cursor.getInt(idColumnIndex);
+                String currentName = cursor.getString(nameColumnIndex);
+                int currentPrice = cursor.getInt(priceColumnIndex);
+                int currentQuantity = cursor.getInt(quantityColumnIndex);
+                String currentImageUri = cursor.getString(imageUriColumnIndex);
+
+                // Display the values from each column of the current row in the cursor in the TextView
+                displayView.append("\n" + currentID + " - "
+                        + currentName + " - "
+                        + currentPrice + " - "
+                        + currentQuantity + " - "
+                        + currentImageUri);
+            }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid
