@@ -65,15 +65,14 @@ public class CatalogActivity extends AppCompatActivity {
                 UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY,
                 UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI};
 
-        // Perform a query on the used_items table
-        Cursor cursor = db.query(
-                UsedItemContract.UsedItemEntry.TABLE_NAME,  // The table to query
-                projection,                                 // The columns to return
-                null,                                       // The columns for the WHERE clause
-                null,                                       // The values for the WHERE clause
-                null,                                       // Don't group the rows
-                null,                                       // Don't filter by row groups
-                null);                                      // The sort order
+        // Perform a query on the provider using the ContactResolver.
+        // Use the {@link UsedItemEntry#CONTENT_URI} to access the used_item data
+        Cursor cursor = getContentResolver().query(
+                UsedItemContract.UsedItemEntry.CONTENT_URI,   // The content URI of the used_items table
+                projection,                                   // The columns to return for each row
+                null,                                         // Selection criteria
+                null,                                         // Selection criteria
+                null);                                        // The sort order for the returned rows
 
         TextView displayView = (TextView)findViewById(R.id.text_view_used_item);
 
