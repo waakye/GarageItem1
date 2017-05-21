@@ -53,9 +53,6 @@ public class CatalogActivity extends AppCompatActivity {
      * the used_items database
      */
     private void displayDatabaseInfo() {
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         // Define a projection that specifies which columns from the database you will actually use
         // after this query
         String[] projection = {
