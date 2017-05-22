@@ -3,7 +3,7 @@ package com.waakye.garageitem;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -13,14 +13,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.waakye.garageitem.data.UsedItemContract;
-import com.waakye.garageitem.data.UsedItemDbHelper;
 
 public class CatalogActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = CatalogActivity.class.getSimpleName();
-
-    /** Database helper that will provide us access to the database */
-    private UsedItemDbHelper mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +33,6 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper and pass the
-        // context, which is the current activity
-        mDbHelper = new UsedItemDbHelper(this);
     }
 
     @Override
@@ -124,9 +117,6 @@ public class CatalogActivity extends AppCompatActivity {
      * only
      */
     private void insertUsedItemViaCatalogActivity() {
-        // Gets the database in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
         // Create a ContentValues object where column names are the keys, and Used Socks's
         // used_items attributes are the values
         ContentValues values = new ContentValues();
@@ -135,15 +125,11 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY, 5);
         values.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI, "");
 
-
-        // Insert a new row for Used Socks in the database, returning the ID of that new row
-        // The first argument for db.insert() is the used_items table name.
-        // The second argument provides the name of a column in which the framework
-        // can insert NULL in the event that the ContentValues is empty (if
-        // this is set to "null", then the framework will not insert a row when
-        // there are no values).
-        // The third argument is the ContentValues object containing the info for Used Socks.
-        long newRowId = db.insert(UsedItemContract.UsedItemEntry.TABLE_NAME, null, values);
+        // Insert a row for Used Socks into the provider using the ContentResolver.
+        // Use the {@link UsedItemEntry#CONTENT_URI} to indicate that we want to insert into the
+        // used_items database table
+        // Receive the new content URI that will allow us to access Used Socks's data in the future
+        Uri newUri = getContentResolver().insert(UsedItemContract.UsedItemEntry.CONTENT_URI, values);
     }
 
     @Override

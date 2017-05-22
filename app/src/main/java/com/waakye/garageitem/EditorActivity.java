@@ -3,7 +3,6 @@ package com.waakye.garageitem;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -23,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.waakye.garageitem.data.UsedItemContract;
-import com.waakye.garageitem.data.UsedItemDbHelper;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -102,12 +100,6 @@ public class EditorActivity extends AppCompatActivity {
         int price = Integer.parseInt(priceString);
         int weight = Integer.parseInt(quantityString);
 
-        // Create database helper
-        UsedItemDbHelper mDbHelper = new UsedItemDbHelper(this);
-
-        // Get the database in write mode
-        SQLiteDatabase database = mDbHelper.getWritableDatabase();
-
         // Create a ContentValues object where column names are the keys, and used_item attributes
         // from the editor are the values
         ContentValues contentValues = new ContentValues();
@@ -116,17 +108,16 @@ public class EditorActivity extends AppCompatActivity {
         contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY, quantityString);
         contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI, imageUriString);
 
-        // Insert a new row for the used_item in the database, returning the ID of that new row
-        long newRowId = database.insert(UsedItemContract.UsedItemEntry.TABLE_NAME,
-                null, contentValues);
-
-        // Show a toast message depending on whether or not the insertion was successful
-        if (newRowId == -1) {
-            // If the row ID is -1, then there was an error with insertion
-            Toast.makeText(this, "Error with saving used_item", Toast.LENGTH_SHORT).show();
+        // Insert a new used_item into the provider, returning the content URI for the new used_item
+        Uri newUri = getContentResolver().insert(UsedItemContract.UsedItemEntry.CONTENT_URI,
+                contentValues);
+        if(newUri == null) {
+            // If the new content URI is null, then there was an error with insertion
+            Toast.makeText(this, getString(R.string.editor_insert_used_item_failed),
+                    Toast.LENGTH_SHORT).show();
         } else {
-            // Otherwise, the insertion was successful and we can display a toast with the row ID
-            Toast.makeText(this, "Used_Item saved with row ID: " + newRowId,
+            // Otherwise, the insertion was successful and we can display a toast.
+            Toast.makeText(this, getString(R.string.editor_insert_used_item_successful),
                     Toast.LENGTH_SHORT).show();
         }
     }

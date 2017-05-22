@@ -63,5 +63,11 @@
     <string name="delete_item_button">Delete Item</string>
 
     <string name="order_more_button">Order More</string>
+
+    <!-- Toast message in editor when new used_item has been successfully inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_used_item_successful">Used Item Saved</string>
+
+    <!-- Toast message in editor when new used_item has failed to be inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_used_item_failed">Error with saving Used Item</string>
 </resources>
 
