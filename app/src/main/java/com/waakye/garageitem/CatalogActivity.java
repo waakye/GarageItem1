@@ -1,6 +1,7 @@
 package com.waakye.garageitem;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -54,6 +56,29 @@ public class CatalogActivity extends AppCompatActivity
         // There is no used_item data yet (until the loader finishes) so pass in null for the Cursor
         mCursorAdapter = new UsedItemCursorAdapter(this, null);
         usedItemListView.setAdapter(mCursorAdapter);
+
+        // Setup the item click listener
+        usedItemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                // Create new intent to go to {@link EditorActivity}
+                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+
+                // Form the content URI that represents the specific used_item that was clicked on,
+                // by appending the "id" (passed as input to this method) onto the
+                // {@link UsedItemEntry#CONTENT_URI}.
+                // For example, the URI would be "content://com.waakye.garageitem/used_items/2"
+                // if the used_item with ID 2 was clicked on
+                Uri currentUsedItemUri
+                        = ContentUris.withAppendedId(UsedItemContract.UsedItemEntry.CONTENT_URI,id);
+
+                // Set the URI on the data field of the intent
+                intent.setData(currentUsedItemUri);
+
+                // Launch the {@link EditorActivity} to display the data for the current used_item
+                startActivity(intent);
+            }
+        });
 
         // Kick off the loader
         getLoaderManager().initLoader(USED_ITEM_LOADER, null, this);

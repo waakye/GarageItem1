@@ -68,6 +68,21 @@ public class EditorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
+        // Examine the intent that was used to launch this activity
+        // in order to figure out if we're creating a new used_item or editing an existing one
+        Intent intent = getIntent();
+        Uri currentUsedItemUri = intent.getData();
+
+        // If the intent DOES NOT contain a used_item content URI, then we know that we are creating
+        // a new used_item
+        if(currentUsedItemUri == null){
+            // This is a new used_item, so change the app bar to say "Add a Used Item"
+            setTitle(getString(R.string.editor_activity_title_new_used_item));
+        } else {
+            // Otherwise, this is an existing used_item, so change app bar to say "Edit Used Item"
+            setTitle(getString(R.string.editor_activity_title_edit_used_item));
+        }
+
         // Find all relevant views that we will need to read user input from
         nameEditText = (EditText)findViewById(R.id.edit_item_name);
         priceEditText = (EditText)findViewById(R.id.edit_item_price);

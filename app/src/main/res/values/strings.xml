@@ -12,7 +12,10 @@
     <string name="add_item_button">Add a New Item</string>
 
     <!-- Title for the activity to add a new item [CHAR LIMIT=20] -->
-    <string name="editor_activity_title_new_item">Add an Item</string>
+    <string name="editor_activity_title_new_used_item">Add an Item</string>
+
+    <!-- Title for the activity to edit an existing used_item [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_edit_used_item">Edit Used Item</string>
 
     <string name="add_image_button">Select An Image</string>
 
@@ -72,5 +75,6 @@
 
     <!-- Title text for the empty view, which describes the the lack of used_items -->
     <string name="empty_view_title_text">Get started by adding a used item</string>
+
 </resources>
 
