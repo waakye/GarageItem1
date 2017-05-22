@@ -127,6 +127,32 @@ public class UsedItemProvider extends ContentProvider {
      * URI for that specific row in the database
      */
     private Uri insertUsedItemViaProvider(Uri uri, ContentValues values) {
+        // Check that the name is not null
+        String name = values.getAsString(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME);
+        if(name == null) {
+            throw new IllegalArgumentException("Used Item requires a name");
+        }
+
+        // If the price is provided, check that it's greater than or equal to 0
+        Integer price = values.getAsInteger(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE);
+        if (price != null && price < 0) {
+            throw new IllegalArgumentException("Used Item requires a valid price");
+        }
+
+        // If the quantity is provided, check that it's greater than or equal to 0
+        Integer quantity = values.getAsInteger(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY);
+        if (quantity != null & quantity < 0) {
+            throw new IllegalArgumentException("Used Item requires a valid quantity");
+        }
+
+        // Check that there is a content URI for the image
+        String image = values.getAsString(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI);
+        if (image == null) {
+            throw new IllegalArgumentException("Used Item requires a photo");
+        }
+
+
+
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
