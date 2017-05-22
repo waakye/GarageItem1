@@ -1,7 +1,10 @@
 package com.waakye.garageitem;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +17,14 @@ import android.widget.ListView;
 
 import com.waakye.garageitem.data.UsedItemContract;
 
-public class CatalogActivity extends AppCompatActivity {
+public class CatalogActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor>{
+
+    /** Identifier for the used_items data loader */
+    private static final int USED_ITEM_LOADER = 0;
+
+    /** Adapter for the ListView */
+    UsedItemCursorAdapter mCursorAdapter;
 
     public static final String LOG_TAG = CatalogActivity.class.getSimpleName();
 
@@ -41,45 +51,12 @@ public class CatalogActivity extends AppCompatActivity {
         View emptyView = findViewById(R.id.empty_view);
         usedItemListView.setEmptyView(emptyView);
 
-    }
+        // There is no used_item data yet (until the loader finishes) so pass in null for the Cursor
+        mCursorAdapter = new UsedItemCursorAdapter(this, null);
+        usedItemListView.setAdapter(mCursorAdapter);
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        displayDatabaseInfo();
-    }
-
-    /**
-     * Temproary helper method to display information in the onscreen TextView about the state of
-     * the used_items database
-     */
-    private void displayDatabaseInfo() {
-        // Define a projection that specifies which columns from the database you will actually use
-        // after this query
-        String[] projection = {
-                UsedItemContract.UsedItemEntry._ID,
-                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME,
-                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE,
-                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY,
-                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI};
-
-        // Perform a query on the provider using the ContactResolver.
-        // Use the {@link UsedItemEntry#CONTENT_URI} to access the used_item data
-        Cursor cursor = getContentResolver().query(
-                UsedItemContract.UsedItemEntry.CONTENT_URI,   // The content URI of the used_items table
-                projection,                                   // The columns to return for each row
-                null,                                         // Selection criteria
-                null,                                         // Selection criteria
-                null);                                        // The sort order for the returned rows
-
-        // Find the ListView which will be populated with used_item data
-        ListView usedItemListView = (ListView)findViewById(R.id.list);
-
-        // Set up an Adapter to create a list item for each row of used_item data in the Cursor
-        UsedItemCursorAdapter adapter = new UsedItemCursorAdapter(this, cursor);
-
-        // Attach adapter to the ListView
-        usedItemListView.setAdapter(adapter);
+        // Kick off the loader
+        getLoaderManager().initLoader(USED_ITEM_LOADER, null, this);
     }
 
     /**
@@ -117,12 +94,42 @@ public class CatalogActivity extends AppCompatActivity {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
                 insertUsedItemViaCatalogActivity();
-                displayDatabaseInfo();
                 return true;
             case R.id.action_delete_all_entries:
                 // Do nothing for now
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        // Define a projection that specifies the columns from the table we care about
+        String[] projection = {
+                UsedItemContract.UsedItemEntry._ID,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY,
+                UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI};
+
+        // This loader will execute the ContentProvider's query method on a background thread
+        return new CursorLoader(this,                           // Parent activity context
+                UsedItemContract.UsedItemEntry.CONTENT_URI,     // Provider content URI to query
+                projection,                                     // Columns to include in the resulting Cursor
+                null,                                           // No selection clause
+                null,                                           // No selection arguments
+                null);                                          // Default sort order
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Update {@link UsedItemCursorAdapter} with this new cursor containing updated used_item data
+        mCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // Callback called when the data needs to be deleted
+        mCursorAdapter.swapCursor(null);
     }
 }
