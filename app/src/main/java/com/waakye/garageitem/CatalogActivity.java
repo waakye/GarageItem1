@@ -33,6 +33,14 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
+        // Find the ListView which will be populated with the used_items data
+        ListView usedItemListView = (ListView)findViewById(R.id.list);
+
+        // Find and set the empty view on the ListView so that it only shows when the list has
+        // 0 items
+        View emptyView = findViewById(R.id.empty_view);
+        usedItemListView.setEmptyView(emptyView);
+
     }
 
     @Override

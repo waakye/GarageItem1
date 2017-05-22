@@ -69,5 +69,8 @@
 
     <!-- Toast message in editor when new used_item has failed to be inserted [CHAR LIMIT=NONE] -->
     <string name="editor_insert_used_item_failed">Error with saving Used Item</string>
+
+    <!-- Title text for the empty view, which describes the the lack of used_items -->
+    <string name="empty_view_title_text">Get started by adding a used item</string>
 </resources>
 

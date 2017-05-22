@@ -20,5 +20,21 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/activity_margin"/>
 
+    <!-- Empty view for the list -->
+    <RelativeLayout
+        android:id="@+id/empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+        
+        <TextView
+            android:id="@+id/empty_title_text"
+            android:text="@string/empty_view_title_text"
+            android:fontFamily="sans-serif"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
 
 </LinearLayout>
