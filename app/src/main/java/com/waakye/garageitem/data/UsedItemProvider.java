@@ -151,8 +151,6 @@ public class UsedItemProvider extends ContentProvider {
             throw new IllegalArgumentException("Used Item requires a photo");
         }
 
-
-
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
@@ -174,7 +172,79 @@ public class UsedItemProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection,  String[] selectionArgs) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String selection,
+                      String[] selectionArgs) {
+        final int match = sUriMatcher.match(uri);
+        switch(match) {
+            case USED_ITEMS:
+                return updateUsedItem(uri, contentValues, selection, selectionArgs);
+            case USED_ITEM_ID:
+                // For the USED_ITEM code, extract out the ID from the URI, so we know which row
+                // to update.  Selection will be "_id=?" and selection arguments will be a String
+                // array containing the actual ID
+                selection = UsedItemContract.UsedItemEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return updateUsedItem(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported for " + uri);
+        }
+    }
+
+    /**
+     * Updated used_items in the database with the given content values.  Apply the changes to the
+     * rows specified in the selection and selection arguments (which could be 0 or 1 or more
+     * used_items).
+     * Return the number of rows that were successful updated.
+     */
+    private int updateUsedItem(Uri uri, ContentValues values, String selection,
+                               String[] selectionArgs) {
+        if (values.containsKey(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME)){
+            String name = values.getAsString(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME);
+            if(name == null) {
+                throw new IllegalArgumentException("Used Item needs a name");
+            }
+        }
+
+        // If the {@link UsedItemEntry#COLUMN_USED_ITEM_NAME} key is present, check that the name
+        // value is not null
+        if(values.containsKey(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME)) {
+            String name = values.getAsString(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME);
+            if(name == null) {
+                throw new IllegalArgumentException("Used Item requires a name.");
+            }
+        }
+
+        // If the {@link UsedItemEntry#COLUMN_USED_ITEM_PRICE} key is present, check that the price
+        // is valid
+        if (values.containsKey(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE)){
+            // Check that the price is greater than or equal to 0
+            Integer price = values.getAsInteger(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE);
+            if(price != null && price < 0) {
+                throw new IllegalArgumentException("Used Item requires valid price.");
+            }
+        }
+
+        // If the {@link UsedItemEntry#COLUMN_USED_ITEM_QUANTITY} key is present, check that the
+        // quantity is valid
+        if (values.containsKey(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY)){
+            // Check that the price is greater than or equal to 0
+            Integer quantity = values.getAsInteger(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY);
+            if(quantity != null && quantity < 0) {
+                throw new IllegalArgumentException("Used Item requires valid quantity.");
+            }
+        }
+
+        if (values.containsKey(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI)){
+            String imageUri = values.getAsString(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI);
+            if(imageUri == null) {
+                throw new IllegalArgumentException("Used Item needs an image uri.");
+            }
+        }
+        // Otherwise, get writeable database to update the data
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Return the number of database rows affected by the update statement
+        return database.update(UsedItemContract.UsedItemEntry.TABLE_NAME, values, selection,
+                selectionArgs);
     }
 }
