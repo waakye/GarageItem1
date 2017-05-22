@@ -108,7 +108,15 @@ public class UsedItemProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+        switch(match){
+            case USED_ITEMS:
+                return UsedItemContract.UsedItemEntry.CONTENT_LIST_TYPE;
+            case USED_ITEM_ID:
+                return UsedItemContract.UsedItemEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
+        }
     }
 
     @Override
