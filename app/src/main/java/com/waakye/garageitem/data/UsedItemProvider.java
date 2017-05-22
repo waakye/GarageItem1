@@ -168,7 +168,22 @@ public class UsedItemProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        // Get writeable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        final int match = sUriMatcher.match(uri);
+        switch(match) {
+            case USED_ITEMS:
+                // Delete all rows that match the selection and selection args
+                return database.delete(UsedItemContract.UsedItemEntry.TABLE_NAME, selection, selectionArgs);
+            case USED_ITEM_ID:
+                // Delete a single row given by the ID in the URI
+                selection = UsedItemContract.UsedItemEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return database.delete(UsedItemContract.UsedItemEntry.TABLE_NAME, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+        }
     }
 
     @Override
