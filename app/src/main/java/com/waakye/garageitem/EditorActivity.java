@@ -44,7 +44,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private boolean isGalleryPicture = false;
 
-
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     /** Tag for logging errors */
@@ -117,9 +116,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     /**
-     * Get user input from editor and save new used_item into database
+     * Get user input from editor and save used_item into database
      */
-    private void insertUsedItemViaEditorActivity() {
+    private void saveUsedItemViaEditorActivity() {
+        // TODO: If the user does not save the image again, then the app crashes
 
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
@@ -138,17 +138,40 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_QUANTITY, quantityString);
         contentValues.put(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_IMAGE_URI, imageUriString);
 
-        // Insert a new used_item into the provider, returning the content URI for the new used_item
-        Uri newUri = getContentResolver().insert(UsedItemContract.UsedItemEntry.CONTENT_URI,
-                contentValues);
-        if(newUri == null) {
-            // If the new content URI is null, then there was an error with insertion
-            Toast.makeText(this, getString(R.string.editor_insert_used_item_failed),
-                    Toast.LENGTH_SHORT).show();
+        // Determine if this is a new or existing used_item by checking if mCurrentUsedItemUri is null or not
+        if (mCurrentUsedItemUri == null) {
+            // This is a NEW used_item, so insert a new used_item into the provider
+            // returning the content URI for the new used_item
+            Uri newUri = getContentResolver().insert(UsedItemContract.UsedItemEntry.CONTENT_URI, contentValues);
+
+            // Show a toast message depending on whether or not the insertion was successful
+            if (newUri == null) {
+                // If the new content URI is null, then there was an error with insertion
+                Toast.makeText(this, getString(R.string.editor_insert_used_item_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the insertion was successful and we can display a toast
+                Toast.makeText(this, getString(R.string.editor_insert_used_item_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
         } else {
-            // Otherwise, the insertion was successful and we can display a toast.
-            Toast.makeText(this, getString(R.string.editor_insert_used_item_successful),
-                    Toast.LENGTH_SHORT).show();
+            // Otherwise, this is an EXISTING used_item, so update the used_item with content URI:
+            // mCurrentUsedItemUri and pass in the new ContentValues.  Pass in null for the
+            // selection and selection args because mCurrentUsedItemUri will already identify the
+            // correct row in the database that we want to modify
+            int rowsAffected = getContentResolver().update(mCurrentUsedItemUri, contentValues, null, null);
+
+            // Show a toast message depending on whether or not the update was successful
+            if(rowsAffected == 0) {
+                // If no rows were affected, then there was an error with the update
+                Toast.makeText(this, getString(R.string.editor_update_used_item_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the update was successful and we can display a toast
+                Toast.makeText(this, getString(R.string.editor_update_used_item_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 
@@ -169,7 +192,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Save used_item to database
-                insertUsedItemViaEditorActivity();
+                saveUsedItemViaEditorActivity();
                 // Exit activity
                 finish();
                 return true;
