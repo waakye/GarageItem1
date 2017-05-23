@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -14,10 +15,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,33 +39,52 @@ import java.io.IOException;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Identifier for the used_item data loader */
+    /**
+     * Identifier for the used_item data loader
+     */
     private static final int EXISTING_USED_ITEM_LOADER = 0;
 
-    /** Content URI for the existing used_item (null if it's a new used_item) */
+    /**
+     * Content URI for the existing used_item (null if it's a new used_item)
+     */
     private Uri mCurrentUsedItemUri;
 
     private boolean isGalleryPicture = false;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    /** Tag for logging errors */
+    /**
+     * Tag for logging errors
+     */
     private static final String LOG_TAG = CatalogActivity.class.getSimpleName();
 
-    /** EditText field to enter the item's name */
+    /**
+     * EditText field to enter the item's name
+     */
     private EditText nameEditText;
 
-    /** EditText field to enter the item's price */
+    /**
+     * EditText field to enter the item's price
+     */
     private EditText priceEditText;
 
-    /** EditText field to enter the item's quantity */
+    /**
+     * EditText field to enter the item's quantity
+     */
     private EditText quantityEditText;
 
-    /** Variables and constants related to image picker */
+    /**
+     * Variables and constants related to image picker
+     */
     private static final int PICK_IMAGE_REQUEST = 0;
 //    private static final int SEND_MAIL_REQUEST = 1;
 
     private static final String STATE_URI = "STATE_URI";
+
+    /**
+     * Boolean flag that keeps track of whether the used_item has been edited (true) or not (false)
+     */
+    private boolean mUsedItemHasChanged = false;
 
     private ImageView mImageView;
     private TextView mTextView;
@@ -70,6 +92,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private Uri mUri;
     private Bitmap mBitmap;
+
+    /**
+     * OnTouchListener that listens for any user touches on a View, implying that they are modifying
+     * the view, and we change the mUsedItemHasChanged boolean is true
+     */
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mUsedItemHasChanged = true;
+            return false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +118,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // If the intent DOES NOT contain a used_item content URI, then we know that we are creating
         // a new used_item
-        if(mCurrentUsedItemUri == null){
+        if (mCurrentUsedItemUri == null) {
             // This is a new used_item, so change the app bar to say "Add a Used Item"
             setTitle(getString(R.string.editor_activity_title_new_used_item));
         } else {
@@ -97,19 +131,26 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         // Find all relevant views that we will need to read user input from
-        nameEditText = (EditText)findViewById(R.id.edit_item_name);
-        priceEditText = (EditText)findViewById(R.id.edit_item_price);
-        quantityEditText = (EditText)findViewById(R.id.edit_item_quantity);
+        nameEditText = (EditText) findViewById(R.id.edit_item_name);
+        priceEditText = (EditText) findViewById(R.id.edit_item_price);
+        quantityEditText = (EditText) findViewById(R.id.edit_item_quantity);
+
+        // Setup OnTouchListeners on all the input fields, so we can determine if the user has
+        // touched or modified them. This will let us know if there are any unsaved changes or not,
+        // if the user tries to leave the editor without saving.
+        nameEditText.setOnTouchListener(mTouchListener);
+        priceEditText.setOnTouchListener(mTouchListener);
+        quantityEditText.setOnTouchListener(mTouchListener);
 
 
         mTextView = (TextView) findViewById(R.id.image_uri);
         mImageView = (ImageView) findViewById(R.id.image);
 
 
-        imageButton = (Button)findViewById(R.id.add_image_button);
-        imageButton.setOnClickListener(new View.OnClickListener(){
+        imageButton = (Button) findViewById(R.id.add_image_button);
+        imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 openImageSelector();
             }
         });
@@ -162,7 +203,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             int rowsAffected = getContentResolver().update(mCurrentUsedItemUri, contentValues, null, null);
 
             // Show a toast message depending on whether or not the update was successful
-            if(rowsAffected == 0) {
+            if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update
                 Toast.makeText(this, getString(R.string.editor_update_used_item_failed),
                         Toast.LENGTH_SHORT).show();
@@ -188,7 +229,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.e(LOG_TAG, "onOptionsItemSelected() method called ... ");
         // User clicked on a menu option in the app bar overflow menu
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Save used_item to database
@@ -202,11 +243,54 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
-                // Navigate back to parent activity (CatalogActivity)
-                NavUtils.navigateUpFromSameTask(this);
+                // If the used_item hasn't changed, continue with navigating up to parent activity
+                // which is the {@link CatalogActivity}
+                if (!mUsedItemHasChanged) {
+                    NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                    return true;
+                }
+                // Otherwise, if there are unsaved changes, set up a dialog to warn the user.
+                // Create a click listener to handle the user confirming that changes should be
+                // discarded
+                DialogInterface.OnClickListener discardButtonClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // User clicked "Discard" button, navigate to parent activity
+                                NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                            }
+                        };
+                // Show a dialog that notifies the user they have unsaved changes
+                showUnsavedChangesDialog(discardButtonClickListener);
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * This method is called when the back button is pressed
+     */
+    @Override
+    public void onBackPressed() {
+        // If the used_item hasn't changed, continue with handling back button press
+        if (!mUsedItemHasChanged) {
+            super.onBackPressed();
+            return;
+        }
+
+        // Otherwise, if there are unsaved changes, setup a dialog to warn the user.
+        // Create a click listener to handle the user confirming that changes should be discarded
+        DialogInterface.OnClickListener discardButtonClickListener =
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // User clicked "Discard" button, close the current activity
+                        finish();
+                    }
+                };
+
+        // Show dialog that there are unsaved changes
+        showUnsavedChangesDialog(discardButtonClickListener);
     }
 
     public void openImageSelector() {
@@ -309,16 +393,44 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 null);                  // Default sort order
     }
 
+    /**
+     * Show a dialog that warns the user there are unsaved changes that will be lost if they
+     * continue leaving the editor
+     * @param discardButtonClickListener    is the click listener for what to do when the user
+     *                                      confirms they want to discard their changes
+     */
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+                // User clicked the "Keep editing" button, so dismiss the dialog and continue
+                // editing the used_item
+                if(dialog != null){
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // End early if the cursor is null or there is less than 1 row in the cursor
-        if (cursor == null || cursor.getCount() < 1){
+        if (cursor == null || cursor.getCount() < 1) {
             return;
         }
 
         // Proceed with moving to the first row of the cursor and reading data from it
         // (This should be the only row in the cursor)
-        if(cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             // Find the columns of used_item attributes that we're interested in
             int nameColumnIndex = cursor.getColumnIndex(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_NAME);
             int priceColumnIndex = cursor.getColumnIndex(UsedItemContract.UsedItemEntry.COLUMN_USED_ITEM_PRICE);

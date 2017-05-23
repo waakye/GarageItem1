@@ -28,6 +28,15 @@
     <!-- Label for editor overflow menu option that sends a mail [CHAR LIMIT=20] -->
     <string name="action_sendmail">Send Mail</string>
 
+    <!-- Dialog message when user is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing</string>
+
+    <!-- Dialog button text for the option to discard a user's changes [CHAR LIMIT=20] -->
+    <string name="discard">Discard</string>
+
+    <!-- Dialog button text for the option to keep editing the current used_item [CHAR LIMIT=20] -->
+    <string name="keep_editing">Keep Editing</string>
+
     <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
     <string name="category_overview">Overview</string>
 
