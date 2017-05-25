@@ -34,4 +34,10 @@
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
     </style>
 
+    <style name="ButtonStyle">
+        <item name="android:backgroundTint">@color/trackSaleButton</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
+
 </resources>

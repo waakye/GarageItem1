@@ -6,4 +6,6 @@
 
     <color name="editorColorPrimary">#1DE9B6</color>
     <color name="editorColorPrimaryDark">#00BFA5</color>
+
+    <color name="trackSaleButton">#FFB74D</color>
 </resources>

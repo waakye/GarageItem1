@@ -5,7 +5,9 @@
 
     <!-- Common margin used throughout the app -->
     <dimen name="activity_margin">16dp</dimen>
-
+    <dimen name="list_item_marginTop">6dp</dimen>
     <dimen name="padding_left_indent">4dp</dimen>
     <dimen name="activity_horizontal_margin">64dp</dimen>
+
+
 </resources>

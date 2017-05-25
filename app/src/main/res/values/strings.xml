@@ -68,7 +68,9 @@
     <!-- Label for tracking the quantity in the Detail Activity -->
     <string name="category_track_quantity">Track Quantity</string>
 
-    <string name="track_a_sale_button">Track a Sale</string>
+    <string name="track_a_sale_button">Track Sale</string>
+
+    <string name="track">Track</string>
 
     <string name="receive_shipment_button">Receive Shipment</string>
 
@@ -91,5 +93,9 @@
     <!-- Title text for the empty view, which describes the the lack of used_items -->
     <string name="empty_view_title_text">Get started by adding a used item</string>
 
+    <!-- List item strings -->
+    <string name="price">Asking Price: $</string>
+
+    <string name="available_quantity">Available Quantity:</string>
 </resources>
 
